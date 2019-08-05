@@ -193,16 +193,18 @@ if __name__=="__main__":
                       ratefile=ratefile, tsfile=tsfile, tunit=tunit,
                       nblock=K)
     opt = bdres[-1]
+    unit = len(trueA) / K
     for nb in range(K):
         res = opt.nbests[nb]
         print('block{}: \n\tobjective value {}'.format(nb+1, res[0]))
         if args.run < 2:
-            pr = precision_recall_sets(set(trueA), set(res[1][0]))
-            FA = Fmeasure(pr[0],pr[1])
-            print('\tA precision:{}, recall:{}, F:{}'\
-                    .format(pr[0],pr[1],FA))
-            auc = auc_trueset_rankscore(trueB, res[1][1])
-            print('\tB auc:{}'.format(auc))
+            for k_index in range(K):
+                pr = precision_recall_sets(set(trueA[K*unit:K*unit + unit]), set(res[1][0]))
+                FA = Fmeasure(pr[0],pr[1])
+                print('\tA precision:{}, recall:{}, F:{}'\
+                        .format(pr[0],pr[1],FA))
+                auc = auc_trueset_rankscore(trueB[K*unit:K*unit + unit], res[1][1])
+                print('\tB auc:{}'.format(auc))
         T = respath+rootnm+'.blk{}'.format(nb+1)
         saveSimpleListData(res[1][0], T+'.rows')
         saveSimpleListData(res[1][1], T+'.colscores')
